@@ -1,4 +1,4 @@
-# RMZ Rambots Repo
+# Ramaz Rambots Repo
 
 ## NOTICE
 
