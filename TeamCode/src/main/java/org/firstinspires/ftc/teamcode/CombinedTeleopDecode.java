@@ -41,6 +41,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /*
@@ -73,11 +74,13 @@ public class CombinedTeleopDecode extends OpMode {
      */
     final double LAUNCHER_TARGET_VELOCITY = 1125;
     final double LAUNCHER_MIN_VELOCITY = 1075;
-    private DcMotor leftDrive = null;
-    private DcMotor rightDrive = null;
-    private DcMotorEx launcher = null;
-    private CRServo leftFeeder = null;
-    private CRServo rightFeeder = null;
+    private DcMotorEx launcher = null; //This is the turret motor
+    public DcMotor frontLeftMotor;
+    public DcMotor frontRightMotor;
+    public DcMotor backLeftMotor;
+    public DcMotor backRightMotor;
+    public Servo servo1;
+    public Servo servo2;
 
     ElapsedTime feederTimer = new ElapsedTime();
 
@@ -120,25 +123,21 @@ public class CombinedTeleopDecode extends OpMode {
          * to 'get' must correspond to the names assigned during the robot configuration
          * step.
          */
-        leftDrive = hardwareMap.get(DcMotor.class, "left_drive");
-        rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
         launcher = hardwareMap.get(DcMotorEx.class, "launcher");
+        frontLeftMotor = hardwareMap.get(DcMotor.class, "frontLeftMotor");
+        frontRightMotor = hardwareMap.get(DcMotor.class, "frontRightMotor");
+        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
+        backLeftMotor = hardwareMap.get(DcMotor.class, "backLeftMotor");
+        backRightMotor = hardwareMap.get(DcMotor.class, "backRightMotor");
+        backRightMotor.setDirection(DcMotor.Direction.REVERSE);
 
-        leftDrive.setZeroPowerBehavior(BRAKE); //Setting zeroPowerBehavior to BRAKE enables a "brake mode". This causes the motor to slow down much faster when it is coasting. This creates a much more controllable drivetrain.
-        rightDrive.setZeroPowerBehavior(BRAKE);
+        //leftDrive.setZeroPowerBehavior(BRAKE); //Setting zeroPowerBehavior to BRAKE enables a "brake mode". This causes the motor to slow down much faster when it is coasting. This creates a much more controllable drivetrain.
+        //rightDrive.setZeroPowerBehavior(BRAKE);
         launcher.setZeroPowerBehavior(BRAKE);
 
         launcher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(300, 0, 0, 10));
 
-        /*
-         * Much like our drivetrain motors, we set the left feeder servo to reverse so that they
-         * both work to feed the ball into the robot.
-         */
-        leftFeeder.setDirection(DcMotorSimple.Direction.REVERSE);
-
-        /*
-         * Tell the driver that initialization is complete.
-         */
+        //Tell the driver that initialization is complete.
         telemetry.addData("Status", "Initialized");
     }
 
