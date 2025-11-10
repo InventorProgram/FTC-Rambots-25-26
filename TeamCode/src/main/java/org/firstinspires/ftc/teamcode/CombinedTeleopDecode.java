@@ -147,69 +147,73 @@ public class CombinedTeleopDecode extends OpMode {
     public void init_loop() {
     }
 
-    /*
-     * Code to run ONCE when the driver hits START
-     */
+     //Code to run ONCE when the driver hits START
     @Override
     public void start() {
     }
 
-    /*
-     * Code to run REPEATEDLY after the driver hits START but before they hit STOP
-     */
+    //Code to run REPEATEDLY after the driver hits START but before they hit STOP
     @Override
-    public void loop() {
-        /*
-         * Here we call a function called arcadeDrive. The arcadeDrive function takes the input from
-         * the joysticks, and applies power to the left and right drive motor to move the robot
-         * as requested by the driver. "arcade" refers to the control style we're using here.
-         * Much like a classic arcade game, when you move the left joystick forward both motors
-         * work to drive the robot forward, and when you move the right joystick left and right
-         * both motors work to rotate the robot. Combinations of these inputs can be used to create
-         * more complex maneuvers.
-         */
-        arcadeDrive(-gamepad1.left_stick_y, gamepad1.right_stick_x);
+    public void loop() { //THIS is where the action takes place
+        //Functions
+        mecanum_drivetrain();
 
-        /*
-         * Here we give the user control of the speed of the launcher motor without automatically
-         * queuing a shot.
-         */
+        //Here we give the user control of the speed of the launcher motor without automatically queuing a shot.
         if (gamepad1.y) {
             launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
         } else if (gamepad1.b) { // stop flywheel
             launcher.setVelocity(STOP_SPEED);
         }
 
-        /*
-         * Now we call our "Launch" function.
-         */
         launch(gamepad1.rightBumperWasPressed());
 
-        /*
-         * Show the state and motor powers
-         */
-        telemetry.addData("State", launchState);
-        telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
-        telemetry.addData("motorSpeed", launcher.getVelocity());
-
+        general_telemetry();
     }
 
-    /*
-     * Code to run ONCE after the driver hits STOP
-     */
+     //Code to run ONCE after the driver hits STOP
     @Override
     public void stop() {
     }
 
-    void arcadeDrive(double forward, double rotate) {
-        leftPower = forward + rotate;
-        rightPower = forward - rotate;
+    public void mecanum_drivetrain() { //Checks joystick input and accordingly sets power level to motors in the mecanum drivetrain
 
-        /*
-         * Send calculated power to wheels
-         */
-        leftDrive.setPower(leftPower);
-        rightDrive.setPower(rightPower);
+        /*Joystick variables and denominator (this is the band-aid solution joystick mapping)
+        double y = -gamepad2.right_stick_x;
+        double x = gamepad2.right_stick_y * 1.1;
+        double r = gamepad2.left_stick_y;
+        */
+
+        //(This is the original mecanum joystick mapping)
+        double y = gamepad2.left_stick_y;
+        double x = -gamepad2.left_stick_x * 1.1;
+        double r = -gamepad2.right_stick_x;
+
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(r), 1);
+
+        //Power variables calculated from joystick variables and denominator
+        double frontLeftPower = (y + x + r) / denominator;
+        double frontRightPower = (y - x - r) / denominator;
+        double backLeftPower = (y - x + r) / denominator;
+        double backRightPower = (y + x -r) / denominator;
+
+        //Setting power ot motors using the power variables
+        frontLeftMotor.setPower(frontLeftPower);
+        frontRightMotor.setPower(frontRightPower);
+        backLeftMotor.setPower(backLeftPower);
+        backRightMotor.setPower(backRightPower);
+    }
+
+    public void general_telemetry(){
+        telemetry.addData("triangle: ",gamepad2.triangle);
+        telemetry.addData("cross: ",gamepad2.cross);
+        telemetry.addData("square: ", gamepad2.square);
+        telemetry.addData("circle: ",gamepad2.circle);
+        telemetry.addData("left_bumper: ",gamepad2.left_bumper);
+
+        //Show the state and motor powers
+        telemetry.addData("State", launchState);
+        telemetry.addData("Motors", "left (%.2f), right (%.2f)", frontLeftPower, frontRightPower, backLeftPower, backRightPower);
+        telemetry.addData("motorSpeed", launcher.getVelocity());
     }
 
     void launch(boolean shotRequested) {
