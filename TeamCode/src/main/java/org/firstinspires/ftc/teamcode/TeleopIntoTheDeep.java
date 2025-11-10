@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name = "Teleop")
 
-public class Teleop extends OpMode {
+public class TeleopIntoTheDeep extends OpMode {
 
     public DcMotor frontLeftMotor;
     public DcMotor frontRightMotor;

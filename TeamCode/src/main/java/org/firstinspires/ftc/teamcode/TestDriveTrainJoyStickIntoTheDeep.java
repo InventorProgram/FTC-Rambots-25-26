@@ -11,11 +11,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp(name = "Into_the_Deep_Teleop")
 
-public class TestDriveTrainJoyStick extends OpMode {
+public class TestDriveTrainJoyStickIntoTheDeep extends OpMode {
     public DcMotorEx launcher;
     public DcMotor frontLeftMotor;
     public DcMotor frontRightMotor;
