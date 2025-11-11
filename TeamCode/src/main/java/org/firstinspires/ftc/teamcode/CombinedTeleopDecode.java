@@ -79,8 +79,12 @@ public class CombinedTeleopDecode extends OpMode {
     public DcMotor frontRightMotor;
     public DcMotor backLeftMotor;
     public DcMotor backRightMotor;
-    public Servo servo1;
-    public Servo servo2;
+    //public Servo servo1;
+    //public Servo servo2;
+    double frontLeftPower = 0;
+    double frontRightPower = 0;
+    double backLeftPower = 0;
+    double backRightPower = 0;
 
     ElapsedTime feederTimer = new ElapsedTime();
 
@@ -131,8 +135,11 @@ public class CombinedTeleopDecode extends OpMode {
         backRightMotor = hardwareMap.get(DcMotor.class, "backRightMotor");
         backRightMotor.setDirection(DcMotor.Direction.REVERSE);
 
-        //leftDrive.setZeroPowerBehavior(BRAKE); //Setting zeroPowerBehavior to BRAKE enables a "brake mode". This causes the motor to slow down much faster when it is coasting. This creates a much more controllable drivetrain.
-        //rightDrive.setZeroPowerBehavior(BRAKE);
+        //Setting zeroPowerBehavior to BRAKE enables a "brake mode". This causes the motor to slow down much faster when it is coasting. This creates a much more controllable drivetrain
+        frontLeftMotor.setZeroPowerBehavior(BRAKE);
+        frontRightMotor.setZeroPowerBehavior(BRAKE);
+        backLeftMotor.setZeroPowerBehavior(BRAKE);
+        backRightMotor.setZeroPowerBehavior(BRAKE);
         launcher.setZeroPowerBehavior(BRAKE);
 
         launcher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(300, 0, 0, 10));
@@ -190,10 +197,10 @@ public class CombinedTeleopDecode extends OpMode {
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(r), 1);
 
         //Power variables calculated from joystick variables and denominator
-        double frontLeftPower = (y + x + r) / denominator;
-        double frontRightPower = (y - x - r) / denominator;
-        double backLeftPower = (y - x + r) / denominator;
-        double backRightPower = (y + x -r) / denominator;
+        frontLeftPower = (y + x + r) / denominator;
+        frontRightPower = (y - x - r) / denominator;
+        backLeftPower = (y - x + r) / denominator;
+        backRightPower = (y + x -r) / denominator;
 
         //Setting power ot motors using the power variables
         frontLeftMotor.setPower(frontLeftPower);
@@ -229,16 +236,16 @@ public class CombinedTeleopDecode extends OpMode {
                 }
                 break;
             case LAUNCH:
-                leftFeeder.setPower(FULL_SPEED);
-                rightFeeder.setPower(FULL_SPEED);
+                //leftFeeder.setPower(FULL_SPEED);
+                //rightFeeder.setPower(FULL_SPEED);
                 feederTimer.reset();
                 launchState = LaunchState.LAUNCHING;
                 break;
             case LAUNCHING:
                 if (feederTimer.seconds() > FEED_TIME_SECONDS) {
                     launchState = LaunchState.IDLE;
-                    leftFeeder.setPower(STOP_SPEED);
-                    rightFeeder.setPower(STOP_SPEED);
+                    //leftFeeder.setPower(STOP_SPEED);
+                    //rightFeeder.setPower(STOP_SPEED);
                 }
                 break;
         }
