@@ -4,6 +4,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
@@ -12,12 +13,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-/**
- * Autonomous for your 4-wheel mecanum robot based on the StarterBot Decode template.
- * Simplified and corrected to work with your TeleOp hardware configuration.
- */
-
-//This is AI generated based on the teleop that has been tailored to our robot and the starter bot autonomous.
 @Autonomous(name="Autonomous Decode (Mecanum)", group="StarterBot")
 public class AutonomousDecode extends OpMode {
 
@@ -40,6 +35,7 @@ public class AutonomousDecode extends OpMode {
 
     // Timers
     private ElapsedTime shotTimer = new ElapsedTime();
+    private ElapsedTime feederTimer = new ElapsedTime();
     private ElapsedTime driveTimer = new ElapsedTime();
 
     // Motors
@@ -48,6 +44,10 @@ public class AutonomousDecode extends OpMode {
     private DcMotor frontRightMotor = null;
     private DcMotor backLeftMotor = null;
     private DcMotor backRightMotor = null;
+
+    // Feeder servos
+    private CRServo leftFeeder = null;
+    private CRServo rightFeeder = null;
 
     // --- Enums ---
     private enum LaunchState { IDLE, PREPARE, LAUNCH }
@@ -69,10 +69,14 @@ public class AutonomousDecode extends OpMode {
         frontRightMotor = hardwareMap.get(DcMotor.class, "frontRightMotor");
         backLeftMotor = hardwareMap.get(DcMotor.class, "backLeftMotor");
         backRightMotor = hardwareMap.get(DcMotor.class, "backRightMotor");
+        leftFeeder = hardwareMap.get(CRServo.class, "leftFeeder");
+        rightFeeder = hardwareMap.get(CRServo.class, "rightFeeder");
 
-        // --- Motor directions (match TeleOp) ---
+        // --- Motor directions ---
         frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
         backRightMotor.setDirection(DcMotor.Direction.REVERSE);
+
+        leftFeeder.setDirection(DcMotor.Direction.REVERSE);
 
         // --- Zero power behaviors ---
         frontLeftMotor.setZeroPowerBehavior(BRAKE);
@@ -88,6 +92,10 @@ public class AutonomousDecode extends OpMode {
         launcher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         launcher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(300, 0, 0, 10));
 
+        // Stop servos initially
+        leftFeeder.setPower(0);
+        rightFeeder.setPower(0);
+
         telemetry.addData("Status", "Initialized");
     }
 
@@ -102,9 +110,7 @@ public class AutonomousDecode extends OpMode {
     }
 
     @Override
-    public void start() {
-        // nothing
-    }
+    public void start() {}
 
     @Override
     public void loop() {
@@ -178,13 +184,21 @@ public class AutonomousDecode extends OpMode {
                 launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
                 if (launcher.getVelocity() > LAUNCHER_MIN_VELOCITY) {
                     launchState = LaunchState.LAUNCH;
+                    leftFeeder.setPower(1);
+                    rightFeeder.setPower(1);
+                    feederTimer.reset();
                 }
                 break;
 
             case LAUNCH:
-                if (shotTimer.seconds() > TIME_BETWEEN_SHOTS) {
-                    launchState = LaunchState.IDLE;
-                    return true;
+                if (feederTimer.seconds() > FEED_TIME) {
+                    leftFeeder.setPower(0);
+                    rightFeeder.setPower(0);
+
+                    if (shotTimer.seconds() > TIME_BETWEEN_SHOTS) {
+                        launchState = LaunchState.IDLE;
+                        return true;
+                    }
                 }
                 break;
         }
@@ -196,7 +210,6 @@ public class AutonomousDecode extends OpMode {
         final double TOLERANCE_MM = 10;
         double targetPosition = distanceUnit.toMm(distance) * TICKS_PER_MM;
 
-        // All four motors should move equally to drive straight
         setAllDriveTarget((int) targetPosition);
         setAllDrivePower(speed);
 
@@ -212,7 +225,6 @@ public class AutonomousDecode extends OpMode {
         double targetMm = angleUnit.toRadians(angle) * (TRACK_WIDTH_MM / 2);
         double targetTicks = targetMm * TICKS_PER_MM;
 
-        // Opposite directions for rotation
         setDriveTargets(-(int) targetTicks, (int) targetTicks, -(int) targetTicks, (int) targetTicks);
         setAllDrivePower(speed);
 
@@ -223,7 +235,6 @@ public class AutonomousDecode extends OpMode {
         return (driveTimer.seconds() > holdSeconds);
     }
 
-    // --- UTILITY METHODS ---
     void resetDriveEncoders() {
         frontLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -260,5 +271,7 @@ public class AutonomousDecode extends OpMode {
     void stopAllMotors() {
         setAllDrivePower(0);
         launcher.setPower(0);
+        leftFeeder.setPower(0);
+        rightFeeder.setPower(0);
     }
 }
