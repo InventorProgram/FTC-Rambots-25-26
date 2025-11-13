@@ -82,13 +82,13 @@ public class TeleopDecode extends OpMode {
     public void loop() {
         mecanum_drivetrain();
 
-        if (gamepad1.y) {
+        if (gamepad2.circle) {
             launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
-        } else if (gamepad1.b) {
+        } else if (gamepad2.square) {
             launcher.setVelocity(STOP_SPEED);
         }
 
-        launch(gamepad1.rightBumperWasPressed());
+        launch(gamepad2.triangle);
 
         general_telemetry();
     }
@@ -116,7 +116,9 @@ public class TeleopDecode extends OpMode {
         telemetry.addData("cross: ", gamepad2.cross);
         telemetry.addData("square: ", gamepad2.square);
         telemetry.addData("circle: ", gamepad2.circle);
-        telemetry.addData("left_bumper: ", gamepad2.left_bumper);
+        telemetry.addData("left stick x: ", gamepad2.left_stick_x);
+        telemetry.addData("left stick y: ", gamepad2.left_stick_y);
+        telemetry.addData("right stick x: ", gamepad2.right_stick_x);
 
         telemetry.addData("State", launchState);
         telemetry.addData("Motors", "FL: %.2f, FR: %.2f, BL: %.2f, BR: %.2f",
