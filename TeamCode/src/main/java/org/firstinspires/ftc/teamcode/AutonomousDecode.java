@@ -13,16 +13,16 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@Autonomous(name="Autonomous Decode (Mecanum)", group="StarterBot")
+@Autonomous(name="Autonomous Decode", group="StarterBot")
 public class AutonomousDecode extends OpMode {
 
-    // --- Launcher constants ---
+    // --- Launcher Constants ---
     final double FEED_TIME = 0.20;
     final double LAUNCHER_TARGET_VELOCITY = 1125;
     final double LAUNCHER_MIN_VELOCITY = 1075;
     final double TIME_BETWEEN_SHOTS = 2;
 
-    // --- Drive constants ---
+    // --- Drive Constants ---
     final double DRIVE_SPEED = 0.5;
     final double ROTATE_SPEED = 0.25;
     final double WHEEL_DIAMETER_MM = 96;
@@ -30,22 +30,23 @@ public class AutonomousDecode extends OpMode {
     final double TICKS_PER_MM = (ENCODER_TICKS_PER_REV / (WHEEL_DIAMETER_MM * Math.PI));
     final double TRACK_WIDTH_MM = 404;
 
+    // --- Launch Constants ---
     int shotsToFire = 3;
     double robotRotationAngle = 45;
 
-    // Timers
+    // --- Timers ---
     private ElapsedTime shotTimer = new ElapsedTime();
     private ElapsedTime feederTimer = new ElapsedTime();
     private ElapsedTime driveTimer = new ElapsedTime();
 
-    // Motors
+    // --- Motors ---
     private DcMotorEx launcher = null;
     private DcMotor frontLeftMotor = null;
     private DcMotor frontRightMotor = null;
     private DcMotor backLeftMotor = null;
     private DcMotor backRightMotor = null;
 
-    // Feeder servos
+    // --- Feeder Servos ---
     private CRServo leftFeeder = null;
     private CRServo rightFeeder = null;
 
@@ -63,7 +64,7 @@ public class AutonomousDecode extends OpMode {
         autonomousState = AutonomousState.LAUNCH;
         launchState = LaunchState.IDLE;
 
-        // --- Hardware map ---
+        // --- Hardware Map ---
         launcher = hardwareMap.get(DcMotorEx.class, "launcher");
         frontLeftMotor = hardwareMap.get(DcMotor.class, "frontLeftMotor");
         frontRightMotor = hardwareMap.get(DcMotor.class, "frontRightMotor");
@@ -72,31 +73,30 @@ public class AutonomousDecode extends OpMode {
         leftFeeder = hardwareMap.get(CRServo.class, "leftFeeder");
         rightFeeder = hardwareMap.get(CRServo.class, "rightFeeder");
 
-        // --- Motor directions ---
+        // --- Motor Directions ---
         frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
         backRightMotor.setDirection(DcMotor.Direction.REVERSE);
 
         leftFeeder.setDirection(DcMotor.Direction.REVERSE);
 
-        // --- Zero power behaviors ---
+        // --- Zero Power Behaviors ---
         frontLeftMotor.setZeroPowerBehavior(BRAKE);
         frontRightMotor.setZeroPowerBehavior(BRAKE);
         backLeftMotor.setZeroPowerBehavior(BRAKE);
         backRightMotor.setZeroPowerBehavior(BRAKE);
         launcher.setZeroPowerBehavior(BRAKE);
 
-        // Reset encoders
-        resetDriveEncoders();
+        resetDriveEncoders(); //Reset encoders
 
-        // --- Launcher setup ---
+        // --- Launcher Setup ---
         launcher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         launcher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(300, 0, 0, 10));
 
-        // Stop servos initially
+        //Initially stop servos:
         leftFeeder.setPower(0);
         rightFeeder.setPower(0);
 
-        telemetry.addData("Status", "Initialized");
+        telemetry.addData("Status", "Initialized"); //send data to display in driver hub
     }
 
     @Override
