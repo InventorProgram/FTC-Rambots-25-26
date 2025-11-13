@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name = "Decode Teleop")
+@TeleOp(name = "Deprecated Teleop")
 
 public class TeleopDecode_deprecated extends OpMode {
 

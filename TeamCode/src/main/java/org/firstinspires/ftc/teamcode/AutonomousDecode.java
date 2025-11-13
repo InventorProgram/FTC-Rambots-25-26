@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@Autonomous(name="Autonomous Decode", group="StarterBot")
+@Autonomous(name="Autonomous Decode", group="Use This")
 public class AutonomousDecode extends OpMode {
 
     // --- Launcher Constants ---
