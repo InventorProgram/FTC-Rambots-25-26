@@ -3,9 +3,8 @@ Documentation:
 insert-useful info here
  */
 
-package org.firstinspires.ftc.teamcode;
+package Misc;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
