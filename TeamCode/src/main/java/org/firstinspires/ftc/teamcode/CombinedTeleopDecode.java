@@ -79,8 +79,6 @@ public class CombinedTeleopDecode extends OpMode {
     public DcMotor frontRightMotor;
     public DcMotor backLeftMotor;
     public DcMotor backRightMotor;
-    //public Servo servo1;
-    //public Servo servo2;
     double frontLeftPower = 0;
     double frontRightPower = 0;
     double backLeftPower = 0;
@@ -141,6 +139,12 @@ public class CombinedTeleopDecode extends OpMode {
         backLeftMotor.setZeroPowerBehavior(BRAKE);
         backRightMotor.setZeroPowerBehavior(BRAKE);
         launcher.setZeroPowerBehavior(BRAKE);
+
+        /*
+         * set Feeders to an initial value to initialize the servo controller
+         */
+        //leftFeeder.setPower(STOP_SPEED);
+        //rightFeeder.setPower(STOP_SPEED);
 
         launcher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(300, 0, 0, 10));
 
