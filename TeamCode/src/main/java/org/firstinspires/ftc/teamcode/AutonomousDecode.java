@@ -101,11 +101,11 @@ public class AutonomousDecode extends OpMode {
 
     @Override
     public void init_loop() {
-        if (gamepad1.b) alliance = Alliance.RED;
-        else if (gamepad1.x) alliance = Alliance.BLUE;
+        if (gamepad2.square) alliance = Alliance.RED;
+        else if (gamepad2.circle) alliance = Alliance.BLUE;
 
-        telemetry.addData("Press X", "for BLUE");
-        telemetry.addData("Press B", "for RED");
+        telemetry.addData("Press circle", "for BLUE");
+        telemetry.addData("Press square", "for RED");
         telemetry.addData("Selected Alliance", alliance);
     }
 
