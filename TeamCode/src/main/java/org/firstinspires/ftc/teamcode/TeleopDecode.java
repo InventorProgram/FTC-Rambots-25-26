@@ -81,13 +81,14 @@ public class TeleopDecode extends OpMode {
     @Override
     public void loop() {
         mecanum_drivetrain();
-
+       
+/*
         if (gamepad2.circle) {
             launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
         } else if (gamepad2.square) {
             launcher.setVelocity(STOP_SPEED);
         }
-
+*/
         launch(gamepad2.triangle);
 
         general_telemetry();
@@ -131,7 +132,11 @@ public class TeleopDecode extends OpMode {
             case IDLE:
                 if (shotRequested) {
                     launchState = LaunchState.SPIN_UP;
+                }else{
+                    launcher.setVelocity(0);
                 }
+                leftFeeder.setPower(STOP_SPEED);
+                rightFeeder.setPower(STOP_SPEED);
                 break;
 
             case SPIN_UP:
@@ -151,8 +156,7 @@ public class TeleopDecode extends OpMode {
             case LAUNCHING:
                 if (feederTimer.seconds() > FEED_TIME_SECONDS) {
                     launchState = LaunchState.IDLE;
-                    leftFeeder.setPower(STOP_SPEED);
-                    rightFeeder.setPower(STOP_SPEED);
+
                 }
                 break;
         }
