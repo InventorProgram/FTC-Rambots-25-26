@@ -19,6 +19,7 @@ public class TeleopDecode extends OpMode {
 
     final double LAUNCHER_TARGET_VELOCITY = 1125;
     final double LAUNCHER_MIN_VELOCITY = 1075;
+    final double STRAFING_CORRECTION = 1.1;
 
     private DcMotorEx launcher = null;
     public DcMotor frontLeftMotor;
@@ -95,17 +96,20 @@ public class TeleopDecode extends OpMode {
     }
 
     public void mecanum_drivetrain() {
+        // --- Controller Variables ---
         double y = gamepad2.left_stick_y;
-        double x = -gamepad2.left_stick_x * 1.1;
+        double x = -gamepad2.left_stick_x * STRAFING_CORRECTION; //This correction empowers the strafing
         double r = -gamepad2.right_stick_x;
 
-        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(r), 1);
+        double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(r), 1); //This is used to scale power variables to [-1,1]
 
+        // --- The Hallowed Mecanum Equations ---
         frontLeftPower = (y + x + r) / denominator;
         frontRightPower = (y - x - r) / denominator;
         backLeftPower = (y - x + r) / denominator;
         backRightPower = (y + x - r) / denominator;
 
+        // --- Set Power ---
         frontLeftMotor.setPower(frontLeftPower);
         frontRightMotor.setPower(frontRightPower);
         backLeftMotor.setPower(backLeftPower);
