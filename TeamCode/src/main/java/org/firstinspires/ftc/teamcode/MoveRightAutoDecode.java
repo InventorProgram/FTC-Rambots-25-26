@@ -10,8 +10,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-@Autonomous(name="Move Left Auto Decode", group="Use This")
-public class MoveLeftAutoDecode extends OpMode {
+@Autonomous(name="Move Right Auto Decode", group="Use This")
+public class MoveRightAutoDecode extends OpMode {
     final double FEED_TIME_SECONDS = 0.20;
     final double STOP_SPEED = 0.0;
     final double FULL_SPEED = 1.0;
@@ -34,7 +34,7 @@ public class MoveLeftAutoDecode extends OpMode {
     double backLeftPower = 0;
     double backRightPower = 0;
 
-    double moveTime = 5.0; // seconds
+    double moveTime = 3.5; // seconds
 
     private ElapsedTime timer = new ElapsedTime();
     private boolean hasMoved = false; // to run the movement only once
@@ -91,7 +91,7 @@ public class MoveLeftAutoDecode extends OpMode {
     @Override
     public void loop() {
         if (!hasMoved) {
-            move(Direction.LEFT);
+            move(Direction.RIGHT);
             // Stop after moveTime seconds
             if (timer.seconds() >= moveTime) {
                 mecanum_drivetrain(0, 0, 0); // stop robot
