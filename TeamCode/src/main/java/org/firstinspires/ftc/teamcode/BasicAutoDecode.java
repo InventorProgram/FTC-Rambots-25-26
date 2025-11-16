@@ -37,9 +37,9 @@ public class BasicAutoDecode extends OpMode {
     double frontRightPower = 0;
     double backLeftPower = 0;
     double backRightPower = 0;
-    private ElapsedTime timer = new ElapsedTime();
-    private boolean movementComplete = false; // to run the movement only once
 
+    private ElapsedTime timer = new ElapsedTime();
+    private boolean hasMoved = false; // to run the movement only once
 
     @Override
     public void init() {
@@ -76,20 +76,19 @@ public class BasicAutoDecode extends OpMode {
     }
 
     @Override
-        public void loop() {
-            double moveTime = 2.0; // seconds
+    public void loop() {
+        double moveTime = 2.0; // seconds
 
-            if (!movementComplete) {
-                mecanum_drivetrain(0, 1, 0); // strafe left
-                if (timer.seconds() >= moveTime) {
-                    // Stop the robot after moveTime seconds
-                    mecanum_drivetrain(0, 0, 0);
-                    movementComplete = true;
-                }
+        if (!hasMoved) {
+            mecanum_drivetrain(0, 1, 0); // strafe left
+            if (timer.seconds() >= moveTime) {
+                // Stop the robot after moveTime seconds
+                mecanum_drivetrain(0, 0, 0);
+                hasMoved = true;
             }
-
-            general_telemetry();
         }
+
+        general_telemetry();
     }
 
     public void mecanum_drivetrain(float y, float x, float r) {

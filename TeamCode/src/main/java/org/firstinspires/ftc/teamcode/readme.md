@@ -129,3 +129,86 @@ Note: Some names start with "Team" and others start with "team".  This is intent
 5)  Add:    include ':Team0417' to the "/settings.gradle" file.
     
 6)  Open up Android Studios and clean out any old files by using the menu to "Build/Clean Project""
+
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name="Basic Autonomous Decode", group="Use This")
+public class BasicAutoDecode extends OpMode {
+    private final AutoBasicDecode autoBasicDecode;
+    final double FEED_TIME_SECONDS = 0.20;
+    final double STOP_SPEED = 0.0;
+    final double FULL_SPEED = 1.0;
+
+    final double LAUNCHER_TARGET_VELOCITY = 1500;
+    final double LAUNCHER_MIN_VELOCITY = 1450;
+    final double STRAFING_CORRECTION = 1.1;
+
+    private DcMotorEx launcher = null;
+    public DcMotor frontLeftMotor;
+    public DcMotor frontRightMotor;
+    public DcMotor backLeftMotor;
+    public DcMotor backRightMotor;
+
+    private CRServo leftFeeder = null;
+    private CRServo rightFeeder = null;
+
+    double frontLeftPower = 0;
+    double frontRightPower = 0;
+    double backLeftPower = 0;
+    double backRightPower = 0;
+    private ElapsedTime timer = new ElapsedTime();
+    private boolean movementComplete = false; // to run the movement only once
+
+    public BasicAutoDecode(AutoBasicDecode autoBasicDecode) {
+        this.autoBasicDecode = autoBasicDecode;
+    }
+
+
+    @Override
+    public void init() {
+
+        launcher = hardwareMap.get(DcMotorEx.class, "launcher");
+        frontLeftMotor = hardwareMap.get(DcMotor.class, "frontLeftMotor");
+        frontRightMotor = hardwareMap.get(DcMotor.class, "frontRightMotor");
+        backLeftMotor = hardwareMap.get(DcMotor.class, "backLeftMotor");
+        backRightMotor = hardwareMap.get(DcMotor.class, "backRightMotor");
+
+        frontRightMotor.setDirection(DcMotor.Direction.REVERSE);
+        backRightMotor.setDirection(DcMotor.Direction.REVERSE);
+
+        frontLeftMotor.setZeroPowerBehavior(BRAKE);
+        frontRightMotor.setZeroPowerBehavior(BRAKE);
+        backLeftMotor.setZeroPowerBehavior(BRAKE);
+        backRightMotor.setZeroPowerBehavior(BRAKE);
+        launcher.setZeroPowerBehavior(BRAKE);
+
+        launcher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(300, 0, 0, 10));
+
+        // --- RESTORED FEEDER LOGIC ---
+        leftFeeder = hardwareMap.get(CRServo.class, "left_feeder");
+        rightFeeder = hardwareMap.get(CRServo.class, "right_feeder");
+
+        leftFeeder.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftFeeder.setPower(STOP_SPEED);
+        rightFeeder.setPower(STOP_SPEED);
+        // --- END FEEDER LOGIC RESTORE ---
+
+        telemetry.addData("Status", "Initialized");
+
+        timer.reset();
+    }
+
+    @Override
+        public void loop() {
+            double moveTime = 2.0; // seconds
+
+            if (!movementComplete) {
+                mecanum_drivetrain(0, 1, 0); // strafe left
+                if (timer.seconds() >= moveTime) {
+                    // Stop the robot after moveTime seconds
+                    mecanum_drivetrain(0, 0, 0);
+                    movementComplete = true;
+                }
+            }
+
+            general_telemetry();
+        }
+    }
