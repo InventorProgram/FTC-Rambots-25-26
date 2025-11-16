@@ -7,15 +7,11 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-
-@Autonomous(name="Basic Autonomous Decode", group="Use This")
-public class BasicAutoDecode extends OpMode {
+@Autonomous(name="Move Left Auto Decode", group="Use This")
+public class MoveLeftAutoDecode extends OpMode {
     final double FEED_TIME_SECONDS = 0.20;
     final double STOP_SPEED = 0.0;
     final double FULL_SPEED = 1.0;
@@ -38,7 +34,7 @@ public class BasicAutoDecode extends OpMode {
     double backLeftPower = 0;
     double backRightPower = 0;
 
-    double moveTime = 2.0; // seconds
+    double moveTime = 5.0; // seconds
 
     private ElapsedTime timer = new ElapsedTime();
     private boolean hasMoved = false; // to run the movement only once
@@ -95,13 +91,7 @@ public class BasicAutoDecode extends OpMode {
     @Override
     public void loop() {
         if (!hasMoved) {
-            // Start moving based on alliance
-            if (alliance == Alliance.RED) {
-                move(Direction.LEFT);
-            } else {
-                move(Direction.RIGHT);
-            }
-
+            move(Direction.LEFT);
             // Stop after moveTime seconds
             if (timer.seconds() >= moveTime) {
                 mecanum_drivetrain(0, 0, 0); // stop robot
@@ -112,7 +102,7 @@ public class BasicAutoDecode extends OpMode {
         general_telemetry();
     }
 
-    public void mecanum_drivetrain(float y, float x, float r) {
+    public void mecanum_drivetrain(double y, double x, double r) {
         // --- Controller Variables ---
         //double y = gamepad2.left_stick_y;
         //double x = -gamepad2.left_stick_x * STRAFING_CORRECTION; //This correction empowers the strafing
@@ -136,16 +126,16 @@ public class BasicAutoDecode extends OpMode {
     public void move(Direction direction) {
         switch (direction) {
             case LEFT:
-                mecanum_drivetrain(0, 1, 0); // strafe left
+                mecanum_drivetrain(0, 0.5, 0); // strafe left
                 break;
             case RIGHT:
-                mecanum_drivetrain(0, -1, 0); // strafe right
+                mecanum_drivetrain(0, -0.5, 0); // strafe right
                 break;
             case FORWARD:
-                mecanum_drivetrain(1, 0, 0); // move forward
+                mecanum_drivetrain(0.5, 0, 0); // move forward
                 break;
             case BACKWARD:
-                mecanum_drivetrain(-1, 0, 0); // move backward
+                mecanum_drivetrain(-0.5, 0, 0); // move backward
                 break;
         }
     }
