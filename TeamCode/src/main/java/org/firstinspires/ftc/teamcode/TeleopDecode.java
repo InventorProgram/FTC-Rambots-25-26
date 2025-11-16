@@ -18,7 +18,7 @@ public class TeleopDecode extends OpMode {
     final double FULL_SPEED = 1.0;
 
     final double LAUNCHER_TARGET_VELOCITY = 1500;
-    final double LAUNCHER_MIN_VELOCITY = 1250;
+    final double LAUNCHER_MIN_VELOCITY = 1450;
     final double STRAFING_CORRECTION = 1.1;
 
     private DcMotorEx launcher = null;
