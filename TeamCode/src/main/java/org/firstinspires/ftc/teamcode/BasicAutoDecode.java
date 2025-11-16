@@ -125,3 +125,4 @@ public class BasicAutoDecode extends OpMode {
                 frontLeftPower, frontRightPower, backLeftPower, backRightPower);
         telemetry.addData("motorSpeed", launcher.getVelocity());
     }
+}
