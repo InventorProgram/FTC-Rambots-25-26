@@ -38,8 +38,15 @@ public class BasicAutoDecode extends OpMode {
     double backLeftPower = 0;
     double backRightPower = 0;
 
+    double moveTime = 2.0; // seconds
+
     private ElapsedTime timer = new ElapsedTime();
     private boolean hasMoved = false; // to run the movement only once
+
+    private enum Direction {LEFT, RIGHT, FORWARD, BACKWARD}
+    private enum Alliance { RED, BLUE }
+
+    private Alliance alliance = Alliance.RED;
 
     @Override
     public void init() {
@@ -59,8 +66,6 @@ public class BasicAutoDecode extends OpMode {
         backRightMotor.setZeroPowerBehavior(BRAKE);
         launcher.setZeroPowerBehavior(BRAKE);
 
-        launcher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(300, 0, 0, 10));
-
         // --- RESTORED FEEDER LOGIC ---
         leftFeeder = hardwareMap.get(CRServo.class, "left_feeder");
         rightFeeder = hardwareMap.get(CRServo.class, "right_feeder");
@@ -76,14 +81,30 @@ public class BasicAutoDecode extends OpMode {
     }
 
     @Override
-    public void loop() {
-        double moveTime = 2.0; // seconds
+    public void init_loop() {
+        if (gamepad2.square){
+            alliance = Alliance.RED;
+        }
+        else if (gamepad2.circle) alliance = Alliance.BLUE;
 
+        telemetry.addData("Press circle", "for BLUE");
+        telemetry.addData("Press square", "for RED");
+        telemetry.addData("Selected Alliance", alliance);
+    }
+
+    @Override
+    public void loop() {
         if (!hasMoved) {
-            mecanum_drivetrain(0, 1, 0); // strafe left
+            // Start moving based on alliance
+            if (alliance == Alliance.RED) {
+                move(Direction.LEFT);
+            } else {
+                move(Direction.RIGHT);
+            }
+
+            // Stop after moveTime seconds
             if (timer.seconds() >= moveTime) {
-                // Stop the robot after moveTime seconds
-                mecanum_drivetrain(0, 0, 0);
+                mecanum_drivetrain(0, 0, 0); // stop robot
                 hasMoved = true;
             }
         }
@@ -110,6 +131,23 @@ public class BasicAutoDecode extends OpMode {
         frontRightMotor.setPower(frontRightPower);
         backLeftMotor.setPower(backLeftPower);
         backRightMotor.setPower(backRightPower);
+    }
+
+    public void move(Direction direction) {
+        switch (direction) {
+            case LEFT:
+                mecanum_drivetrain(0, 1, 0); // strafe left
+                break;
+            case RIGHT:
+                mecanum_drivetrain(0, -1, 0); // strafe right
+                break;
+            case FORWARD:
+                mecanum_drivetrain(1, 0, 0); // move forward
+                break;
+            case BACKWARD:
+                mecanum_drivetrain(-1, 0, 0); // move backward
+                break;
+        }
     }
 
     public void general_telemetry() {
