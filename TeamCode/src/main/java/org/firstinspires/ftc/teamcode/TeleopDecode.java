@@ -17,8 +17,10 @@ public class TeleopDecode extends OpMode {
     final double STOP_SPEED = 0.0;
     final double FULL_SPEED = 1.0;
 
-    double LAUNCHER_TARGET_VELOCITY = 2000;
-    double LAUNCHER_MIN_VELOCITY = 1950;
+    double LAUNCHER_TARGET_VELOCITY_DEFAULT = 1500;
+    double LAUNCHER_MIN_VELOCITY_DEFAULT = 1450;
+    double launcher_target_velocity = LAUNCHER_TARGET_VELOCITY_DEFAULT;
+    double launcher_min_velocity = LAUNCHER_MIN_VELOCITY_DEFAULT;
     final double STRAFING_CORRECTION = 1.1;
 
     private DcMotorEx launcher = null;
@@ -92,20 +94,25 @@ public class TeleopDecode extends OpMode {
 */
         launch(gamepad2.triangle);
 
-        adjust_launch_velocity();
+        //adjust_launch_velocity();
 
         general_telemetry();
     }
 
     public void adjust_launch_velocity(){
         if (gamepad2.dpad_up){
-            LAUNCHER_TARGET_VELOCITY += 100;
-            LAUNCHER_MIN_VELOCITY += 100;
+            launcher_target_velocity += 100;
+            launcher_min_velocity += 100;
         }
 
-        if (gamepad2.dpad_up){
-            LAUNCHER_TARGET_VELOCITY -= 100;
-            LAUNCHER_MIN_VELOCITY -= 100;
+        if (gamepad2.dpad_down){
+            launcher_target_velocity -= 100;
+            launcher_min_velocity -= 100;
+        }
+
+        if(gamepad2.circle){ //reset velocities
+            launcher_target_velocity = LAUNCHER_TARGET_VELOCITY_DEFAULT;
+            launcher_min_velocity = LAUNCHER_MIN_VELOCITY_DEFAULT;
         }
 
     }
@@ -144,6 +151,7 @@ public class TeleopDecode extends OpMode {
         telemetry.addData("Motors", "FL: %.2f, FR: %.2f, BL: %.2f, BR: %.2f",
                 frontLeftPower, frontRightPower, backLeftPower, backRightPower);
         telemetry.addData("motorSpeed", launcher.getVelocity());
+        telemetry.addData("target velocity: ", launcher_target_velocity);
     }
 
     void launch(boolean shotRequested) {
@@ -159,8 +167,8 @@ public class TeleopDecode extends OpMode {
                 break;
 
             case SPIN_UP:
-                launcher.setVelocity(LAUNCHER_TARGET_VELOCITY);
-                if (launcher.getVelocity() > LAUNCHER_MIN_VELOCITY) {
+                launcher.setVelocity(launcher_target_velocity);
+                if (launcher.getVelocity() > launcher_min_velocity) {
                     launchState = LaunchState.LAUNCH;
                 }
                 break;
