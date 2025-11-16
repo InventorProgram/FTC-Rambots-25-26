@@ -17,8 +17,8 @@ public class TeleopDecode extends OpMode {
     final double STOP_SPEED = 0.0;
     final double FULL_SPEED = 1.0;
 
-    final double LAUNCHER_TARGET_VELOCITY = 2000;
-    final double LAUNCHER_MIN_VELOCITY = 1950;
+    double LAUNCHER_TARGET_VELOCITY = 2000;
+    double LAUNCHER_MIN_VELOCITY = 1950;
     final double STRAFING_CORRECTION = 1.1;
 
     private DcMotorEx launcher = null;
@@ -92,7 +92,22 @@ public class TeleopDecode extends OpMode {
 */
         launch(gamepad2.triangle);
 
+        adjust_launch_velocity();
+
         general_telemetry();
+    }
+
+    public void adjust_launch_velocity(){
+        if (gamepad2.dpad_up){
+            LAUNCHER_TARGET_VELOCITY += 50;
+            LAUNCHER_MIN_VELOCITY += 50;
+        }
+
+        if (gamepad2.dpad_up){
+            LAUNCHER_TARGET_VELOCITY -= 50;
+            LAUNCHER_MIN_VELOCITY -= 50;
+        }
+
     }
 
     public void mecanum_drivetrain() {
