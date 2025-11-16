@@ -99,13 +99,13 @@ public class TeleopDecode extends OpMode {
 
     public void adjust_launch_velocity(){
         if (gamepad2.dpad_up){
-            LAUNCHER_TARGET_VELOCITY += 50;
-            LAUNCHER_MIN_VELOCITY += 50;
+            LAUNCHER_TARGET_VELOCITY += 100;
+            LAUNCHER_MIN_VELOCITY += 100;
         }
 
         if (gamepad2.dpad_up){
-            LAUNCHER_TARGET_VELOCITY -= 50;
-            LAUNCHER_MIN_VELOCITY -= 50;
+            LAUNCHER_TARGET_VELOCITY -= 100;
+            LAUNCHER_MIN_VELOCITY -= 100;
         }
 
     }
