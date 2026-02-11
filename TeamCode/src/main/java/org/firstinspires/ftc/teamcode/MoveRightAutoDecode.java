@@ -34,7 +34,7 @@ public class MoveRightAutoDecode extends OpMode {
     double backLeftPower = 0;
     double backRightPower = 0;
 
-    double moveTime = 3.5; // seconds
+    double moveTime = 2.5; // seconds
 
     private ElapsedTime timer = new ElapsedTime();
     private boolean hasMoved = false; // to run the movement only once
