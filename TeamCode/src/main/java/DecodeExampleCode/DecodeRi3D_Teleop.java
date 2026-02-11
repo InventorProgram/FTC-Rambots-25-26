@@ -48,10 +48,10 @@ Description: This file is the 3-day robot example code.
 //@Disabled
 public class DecodeRi3D_Teleop extends OpMode {
     final double FEED_TIME_SECONDS = 0.80; //The feeder servos run this long when a shot is requested.
-    final double STOP_SPEED = 0.0; //We send this power to the servos when we want them to stop.
-    final double FULL_SPEED = 1.0;
+    final double STOP_SPEED = 0.0; //This is the stopping power level. We send this power to the servos when we want them to stop.
+    final double FULL_SPEED = 1.0; //This is the max speed power leve.
 
-    final double LAUNCHER_CLOSE_TARGET_VELOCITY = 1200; //in ticks/second for the close goal.
+    final double LAUNCHER_CLOSE_TARGET_VELOCITY = 1200; //in ticks/second for the close goal. The unit is encoder ticks per second, not RPM.
     final double LAUNCHER_CLOSE_MIN_VELOCITY = 1175; //minimum required to start a shot for close goal.
 
     final double LAUNCHER_FAR_TARGET_VELOCITY = 1350; //Target velocity for far goal
@@ -60,7 +60,7 @@ public class DecodeRi3D_Teleop extends OpMode {
     double launcherTarget = LAUNCHER_CLOSE_TARGET_VELOCITY; //These variables allow
     double launcherMin = LAUNCHER_CLOSE_MIN_VELOCITY;
 
-    final double LEFT_POSITION = 0.2962; //the left and right position for the diverter servo
+    final double LEFT_POSITION = 0.2962; //The left and right position for the diverter servo. These should be tuned.
     final double RIGHT_POSITION = 0;
 
     // Declare OpMode members.
