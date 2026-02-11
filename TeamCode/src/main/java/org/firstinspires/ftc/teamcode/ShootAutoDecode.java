@@ -10,6 +10,10 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+/*
+Description: This is the autonomous file we used for the first competition we attended of the Decode season.
+ */
+
 @Autonomous(name="Shoot Auto Decode", group="Use This")
 public class ShootAutoDecode extends OpMode {
     final double FEED_TIME_SECONDS = 0.20;

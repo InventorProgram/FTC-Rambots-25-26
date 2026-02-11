@@ -13,6 +13,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
+/*
+Description: This file is an autonomous routine.
+ */
+
 @Autonomous(name="Autonomous Decode", group="Use This")
 public class AutonomousDecode extends OpMode {
 

@@ -11,6 +11,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+/*
+Description: This is the teleop file for the first competition we attended of the Decode season.
+ */
+
 @TeleOp(name = "Teleop Decode", group = "Use This")
 public class TeleopDecode extends OpMode {
     final double FEED_TIME_SECONDS = 0.20;

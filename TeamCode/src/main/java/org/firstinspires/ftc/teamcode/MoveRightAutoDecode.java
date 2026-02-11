@@ -10,6 +10,10 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+/*
+Description: This file moves the robot right autonomously.
+ */
+
 @Autonomous(name="Move Right Auto Decode", group="Use This")
 public class MoveRightAutoDecode extends OpMode {
     final double FEED_TIME_SECONDS = 0.20;

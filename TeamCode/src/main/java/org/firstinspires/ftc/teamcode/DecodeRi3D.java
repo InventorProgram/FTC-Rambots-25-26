@@ -36,6 +36,10 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /*
+Description: This file is the 3-day robot example code.
+ */
+
+/*
  * This file includes a teleop (driver-controlled) file for the goBILDA® Robot in 3 Days for the
  * 2025-2026 FIRST® Tech Challenge season DECODE™!
  */

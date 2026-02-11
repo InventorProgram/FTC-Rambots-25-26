@@ -1,10 +1,13 @@
-package org.firstinspires.ftc.teamcode.Autonomous;
+package DecodeObsolete;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+/*
+Description: This autonomous is most likely a failed experiment.
+ */
 
 @Autonomous(name="Time-Based Auto Decode", group="Linear Opmode")
 public class TimeBasedAutoDecode extends LinearOpMode {
