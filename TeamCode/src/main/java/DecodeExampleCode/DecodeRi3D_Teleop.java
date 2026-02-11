@@ -46,7 +46,7 @@ Description: This file is the 3-day robot example code.
 
 @TeleOp(name = "DECODE Ri3D", group = "StarterBot")
 //@Disabled
-public class DecodeRi3D extends OpMode {
+public class DecodeRi3D_Teleop extends OpMode {
     final double FEED_TIME_SECONDS = 0.80; //The feeder servos run this long when a shot is requested.
     final double STOP_SPEED = 0.0; //We send this power to the servos when we want them to stop.
     final double FULL_SPEED = 1.0;
