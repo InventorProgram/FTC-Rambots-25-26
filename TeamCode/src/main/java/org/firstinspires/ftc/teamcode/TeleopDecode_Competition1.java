@@ -16,7 +16,7 @@ Description: This is the teleop file for the first competition we attended of th
  */
 
 @TeleOp(name = "Teleop Decode", group = "Use This")
-public class TeleopDecode_PreviousCompetition extends OpMode {
+public class TeleopDecode_Competition1 extends OpMode {
     final double FEED_TIME_SECONDS = 0.20;
     final double STOP_SPEED = 0.0;
     final double FULL_SPEED = 1.0;
