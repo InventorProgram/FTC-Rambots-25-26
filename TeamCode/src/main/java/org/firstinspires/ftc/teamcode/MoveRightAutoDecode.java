@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 /*
-Description: This file moves the robot right autonomously.
+Description: This file moves the robot right autonomously. It is useful in a pinch.
  */
 
 @Autonomous(name="Move Right Auto Decode", group="Use This")

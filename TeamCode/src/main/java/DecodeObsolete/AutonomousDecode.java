@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package DecodeObsolete;
 
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.BRAKE;
 
@@ -14,7 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 /*
-Description: This file is an autonomous routine.
+Description: This file is an autonomous routine we didn't end up using because we weren't using encoders for the first competition.
  */
 
 @Autonomous(name="Autonomous Decode", group="Use This")
