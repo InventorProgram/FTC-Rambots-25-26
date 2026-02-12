@@ -341,7 +341,7 @@ public class DecodeRi3D_Teleop extends OpMode {
             case SPIN_UP:
                 leftLauncher.setVelocity(launcherTarget);
                 rightLauncher.setVelocity(launcherTarget);
-                if (leftLauncher.getVelocity() > launcherMin) {
+                if (rightLauncher.getVelocity() > launcherMin) {
                     rightLaunchState = LaunchState.LAUNCH;
                 }
                 break;
