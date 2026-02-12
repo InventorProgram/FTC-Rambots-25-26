@@ -34,9 +34,12 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 /*
 Description: This file is the 3-day robot example code.
+
+ToDo:
+- Add precision drive (hold button for half-power)
+-
  */
 
 /*
