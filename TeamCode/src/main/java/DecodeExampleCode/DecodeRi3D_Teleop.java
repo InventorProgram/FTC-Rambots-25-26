@@ -122,15 +122,15 @@ public class DecodeRi3D_Teleop extends OpMode {
         leftLaunchState = LaunchState.IDLE;
         rightLaunchState = LaunchState.IDLE;
 
-        leftFrontDrive = hardwareMap.get(DcMotor.class, "left_front_drive");
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
-        leftBackDrive = hardwareMap.get(DcMotor.class, "left_back_drive");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
-        leftLauncher = hardwareMap.get(DcMotorEx.class, "left_launcher");
-        rightLauncher = hardwareMap.get(DcMotorEx.class, "right_launcher");
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "frontLeftMotor");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "frontRightMotor");
+        leftBackDrive = hardwareMap.get(DcMotor.class, "backLeftMotor");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "backRightMotor");
+        leftLauncher = hardwareMap.get(DcMotorEx.class, "leftLauncher");
+        rightLauncher = hardwareMap.get(DcMotorEx.class, "rightLauncher");
         intake = hardwareMap.get(DcMotor.class, "intake");
-        leftFeeder = hardwareMap.get(CRServo.class, "left_feeder");
-        rightFeeder = hardwareMap.get(CRServo.class, "right_feeder");
+        leftFeeder = hardwareMap.get(CRServo.class, "leftFeeder");
+        rightFeeder = hardwareMap.get(CRServo.class, "rightFeeder");
         diverter = hardwareMap.get(Servo.class, "diverter");
 
         /*
@@ -205,21 +205,21 @@ public class DecodeRi3D_Teleop extends OpMode {
     @Override
     public void loop() {
 
-        mecanumDrive(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
+        mecanumDrive(-gamepad2.left_stick_y, gamepad2.left_stick_x, gamepad2.right_stick_x);
 
         /*
          * Here we give the user control of the speed of the launcher motor without automatically
          * queuing a shot.
          */
-        if (gamepad1.y) {
+        if (gamepad2.triangle) {
             leftLauncher.setVelocity(launcherTarget);
             rightLauncher.setVelocity(launcherTarget);
-        } else if (gamepad1.b) { // stop flywheel
+        } else if (gamepad2.circle) { // stop flywheel
             leftLauncher.setVelocity(STOP_SPEED);
             rightLauncher.setVelocity(STOP_SPEED);
         }
 
-        if (gamepad1.dpadDownWasPressed()) {
+        if (gamepad2.dpadDownWasPressed()) {
             switch (diverterDirection){
                 case LEFT:
                     diverterDirection = DiverterDirection.RIGHT;
@@ -232,7 +232,7 @@ public class DecodeRi3D_Teleop extends OpMode {
             }
         }
 
-        if (gamepad1.aWasPressed()){
+        if (gamepad2.crossWasPressed()){
             switch (intakeState){
                 case ON:
                     intakeState = IntakeState.OFF;
@@ -245,7 +245,7 @@ public class DecodeRi3D_Teleop extends OpMode {
             }
         }
 
-        if (gamepad1.dpadUpWasPressed()) {
+        if (gamepad2.dpadUpWasPressed()) {
             switch (launcherDistance) {
                 case CLOSE:
                     launcherDistance = LauncherDistance.FAR;
@@ -263,8 +263,8 @@ public class DecodeRi3D_Teleop extends OpMode {
         /*
          * Now we call our "Launch" function.
          */
-        launchLeft(gamepad1.leftBumperWasPressed());
-        launchRight(gamepad1.rightBumperWasPressed());
+        launchLeft(gamepad2.leftBumperWasPressed());
+        launchRight(gamepad2.rightBumperWasPressed());
 
         /*
          * Show the state and motor powers
