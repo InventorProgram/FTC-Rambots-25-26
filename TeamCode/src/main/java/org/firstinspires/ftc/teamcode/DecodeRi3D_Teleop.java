@@ -63,7 +63,7 @@ public class DecodeRi3D_Teleop extends OpMode {
     double launcherTarget = LAUNCHER_CLOSE_TARGET_VELOCITY; //These variables allow
     double launcherMin = LAUNCHER_CLOSE_MIN_VELOCITY;
 
-    final double LEFT_POSITION = 0.2962; //The left and right position for the diverter servo. These should be tuned.
+    final double LEFT_POSITION = .5; //0.2962; //The left and right position for the diverter servo. These should be tuned.
     final double RIGHT_POSITION = 0;
 
     // Declare OpMode members.
@@ -214,9 +214,9 @@ public class DecodeRi3D_Teleop extends OpMode {
          * Here we give the user control of the speed of the launcher motor without automatically
          * queuing a shot.
          */
-        if (gamepad2.square) {
-            rightFeeder.setPower(FULL_SPEED);
-        }
+//        if (gamepad2.square) {
+//            rightFeeder.setPower(FULL_SPEED);
+//        }
 
         if (gamepad2.triangle) {
             leftLauncher.setVelocity(launcherTarget);
@@ -350,7 +350,7 @@ public class DecodeRi3D_Teleop extends OpMode {
             case SPIN_UP:
                 leftLauncher.setVelocity(launcherTarget);
                 rightLauncher.setVelocity(launcherTarget);
-                if (rightLauncher.getVelocity() > launcherMin) {
+                if (leftLauncher.getVelocity() > launcherMin) {
                     rightLaunchState = LaunchState.LAUNCH;
                 }
                 break;
