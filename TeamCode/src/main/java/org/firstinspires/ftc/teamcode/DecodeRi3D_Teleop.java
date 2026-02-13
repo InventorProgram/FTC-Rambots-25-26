@@ -214,6 +214,10 @@ public class DecodeRi3D_Teleop extends OpMode {
          * Here we give the user control of the speed of the launcher motor without automatically
          * queuing a shot.
          */
+        if (gamepad2.square) {
+            rightFeeder.setPower(FULL_SPEED);
+        }
+
         if (gamepad2.triangle) {
             leftLauncher.setVelocity(launcherTarget);
             rightLauncher.setVelocity(launcherTarget);
