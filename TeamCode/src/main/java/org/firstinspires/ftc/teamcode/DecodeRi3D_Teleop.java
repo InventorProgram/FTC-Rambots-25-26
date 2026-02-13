@@ -47,7 +47,7 @@ ToDo:
  * 2025-2026 FIRST® Tech Challenge season DECODE™!
  */
 
-@TeleOp(name = "DECODE Ri3D", group = "StarterBot")
+@TeleOp(name = "DECODE Ri3D Teleop", group = "StarterBot")
 //@Disabled
 public class DecodeRi3D_Teleop extends OpMode {
     final double FEED_TIME_SECONDS = 0.80; //The feeder servos run this long when a shot is requested.

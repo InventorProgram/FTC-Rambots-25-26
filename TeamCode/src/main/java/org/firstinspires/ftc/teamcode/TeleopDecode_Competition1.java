@@ -15,7 +15,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 Description: This is the teleop file for the first competition we attended of the Decode season.
  */
 
-@TeleOp(name = "Teleop Decode", group = "Use This")
+@TeleOp(name = "Teleop Decode (Competition 1)", group = "Use This")
 public class TeleopDecode_Competition1 extends OpMode {
     final double FEED_TIME_SECONDS = 0.20;
     final double STOP_SPEED = 0.0;
