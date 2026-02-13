@@ -224,6 +224,8 @@ public class DecodeRi3D_Teleop extends OpMode {
         } else if (gamepad2.circle) { // stop flywheel
             leftLauncher.setVelocity(STOP_SPEED);
             rightLauncher.setVelocity(STOP_SPEED);
+            leftLaunchState = LaunchState.IDLE;
+            rightLaunchState = LaunchState.IDLE;
         }
 
         if (gamepad2.dpadDownWasPressed()) {
