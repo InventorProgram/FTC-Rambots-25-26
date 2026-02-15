@@ -139,9 +139,9 @@ public class EncoderAutoDecode extends LinearOpMode {
 
             while (opModeIsActive() &&
                     (leftLauncher.getVelocity() < LAUNCHER_MIN ||
-                            rightLauncher.getVelocity() < LAUNCHER_MIN) &&
+                            leftLauncher.getVelocity() < LAUNCHER_MIN) &&
                     runtime.seconds() < AUTO_TIMEOUT_S) {
-                telemetry.addData("Launcher L/R", "%.0f / %.0f", leftLauncher.getVelocity(), rightLauncher.getVelocity());
+                telemetry.addData("Launcher L/R", "%.0f / %.0f", leftLauncher.getVelocity(), leftLauncher.getVelocity());
                 telemetry.update();
                 sleep(40);
             }
