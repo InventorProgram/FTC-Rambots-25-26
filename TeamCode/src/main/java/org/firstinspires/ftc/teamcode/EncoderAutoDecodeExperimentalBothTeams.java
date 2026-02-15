@@ -12,10 +12,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-@Autonomous(name = "Autonomous: Decode (w/ Encoders) Experimental", group = "Competition 2-15-26")
+@Autonomous(name = "Autonomous: Decode (w/ Encoders) Experimental Both Teams", group = "Competition 2-15-26")
 public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
 
-    // Hardware from your teleop
+    // Hardware
     private DcMotorEx leftFrontDrive, rightFrontDrive, leftBackDrive, rightBackDrive;
     private DcMotorEx leftLauncher;
     private CRServo leftFeeder, rightFeeder;
@@ -23,7 +23,7 @@ public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
     private IMU imu;
     private HuskyLens husky;
 
-    // Constants from your teleop
+    // Launcher & feeder constants
     private final double LAUNCHER_TARGET = 1200;
     private final double LAUNCHER_MIN    = 1175;
     private final double FEED_TIME       = 0.80;
@@ -31,16 +31,21 @@ public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
     private final double STOP_SPEED      = 0.0;
 
     // Drive tuning
-    private final double TICKS_PER_INCH  = 42.8;      // TUNE THIS using leftFront encoder
-    private final double DRIVE_POWER     = 0.35;      // slow & controlled
-    private final double HEADING_P       = 0.018;     // tune 0.01–0.025
-    private final double AUTO_TIMEOUT_S  = 28.0;      // safety
+    private final double TICKS_PER_INCH  = 42.8;
+    private final double DRIVE_POWER     = 0.35;
+    private final double HEADING_P       = 0.018;
+    private final double AUTO_TIMEOUT_S  = 28.0;
 
     private ElapsedTime runtime = new ElapsedTime();
 
+    // Alliance flag
+    private boolean isRedAlliance = true; // default
+
     @Override
     public void runOpMode() {
+        // ──────────────────────
         // Hardware mapping
+        // ──────────────────────
         leftFrontDrive  = hardwareMap.get(DcMotorEx.class, "frontLeftMotor");
         rightFrontDrive = hardwareMap.get(DcMotorEx.class, "frontRightMotor");
         leftBackDrive   = hardwareMap.get(DcMotorEx.class, "backLeftMotor");
@@ -50,7 +55,7 @@ public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
         rightFeeder     = hardwareMap.get(CRServo.class, "rightFeeder");
         diverter        = hardwareMap.get(Servo.class, "diverter");
 
-        // Directions & modes (from your teleop)
+        // Directions & modes
         leftFrontDrive.setDirection(DcMotorEx.Direction.REVERSE);
         rightFrontDrive.setDirection(DcMotorEx.Direction.FORWARD);
         leftBackDrive.setDirection(DcMotorEx.Direction.REVERSE);
@@ -83,24 +88,38 @@ public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
         // Initial servo states
         leftFeeder.setPower(STOP_SPEED);
         rightFeeder.setPower(STOP_SPEED);
-        diverter.setPosition(0.15); // middle starting guess
+        diverter.setPosition(0.15);
 
-        telemetry.addData("Status", "Ready - Husky + IMU + 1 encoder");
-        telemetry.addData("TICKS_PER_INCH (must tune)", TICKS_PER_INCH);
+        // ──────────────────────
+        // Alliance selection via gamepad
+        // ──────────────────────
+        telemetry.addLine("Select Alliance: A = RED, B = BLUE");
         telemetry.update();
+
+        while (!isStarted() && !isStopRequested()) {
+            if (gamepad1.a) {
+                isRedAlliance = true;
+                telemetry.addLine("Alliance: RED");
+                telemetry.update();
+            } else if (gamepad1.b) {
+                isRedAlliance = false;
+                telemetry.addLine("Alliance: BLUE");
+                telemetry.update();
+            }
+            sleep(50);
+        }
 
         waitForStart();
         runtime.reset();
 
         if (opModeIsActive()) {
-            // Reset drive encoder (only one has it)
             leftFrontDrive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
             leftFrontDrive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
             imu.resetYaw();
 
-            // ──────────────────────────────────────────────
-            // Step 1: Detect motif tag (run early)
-            // ──────────────────────────────────────────────
+            // ──────────────────────
+            // Step 1: Detect motif
+            // ──────────────────────
             int motifTag = -1;
             for (int i = 0; i < 30 && opModeIsActive(); i++) {
                 HuskyLens.Block[] blocks = husky.blocks();
@@ -118,35 +137,35 @@ public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
             if (motifTag == 21)      motif = "GPP";
             else if (motifTag == 22) motif = "PGP";
             else if (motifTag == 23) motif = "PPG";
-            else                     motif = "UNKNOWN - default center";
+            else                     motif = "UNKNOWN";
 
             telemetry.addData("Motif Tag", motifTag + " → " + motif);
             telemetry.update();
 
-            // ──────────────────────────────────────────────
+            // ──────────────────────
             // Step 2: Drive forward to shooting range
-            // ──────────────────────────────────────────────
-            driveStraightTicks(1600, DRIVE_POWER);   // ≈37 inches – tune this value!
+            // ──────────────────────
+            int forwardTicks = isRedAlliance ? 1600 : -1600; // mirror for blue
+            driveStraightTicks(forwardTicks, DRIVE_POWER);
 
-            // ──────────────────────────────────────────────
+            // ──────────────────────
             // Step 3: Spin up launcher
-            // ──────────────────────────────────────────────
+            // ──────────────────────
             leftLauncher.setVelocity(LAUNCHER_TARGET);
-
             while (opModeIsActive() && leftLauncher.getVelocity() < LAUNCHER_MIN && runtime.seconds() < AUTO_TIMEOUT_S) {
                 telemetry.addData("Launcher", "%.0f", leftLauncher.getVelocity());
                 telemetry.update();
                 sleep(40);
             }
 
-            // ──────────────────────────────────────────────
-            // Step 4: Set diverter & shoot 3× (simple motif logic)
-            // ──────────────────────────────────────────────
-            double diverterPos = 0.15; // default center
+            // ──────────────────────
+            // Step 4: Set diverter & shoot
+            // ──────────────────────
+            double diverterPos = 0.15;
             if (motif.startsWith("G")) {
-                diverterPos = 0.0;     // right position example
+                diverterPos = isRedAlliance ? 0.0 : 0.2962;
             } else if (motif.startsWith("P")) {
-                diverterPos = 0.2962;  // left position example
+                diverterPos = isRedAlliance ? 0.2962 : 0.0;
             }
             diverter.setPosition(diverterPos);
 
@@ -158,13 +177,15 @@ public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
                 leftFeeder.setPower(STOP_SPEED);
                 rightFeeder.setPower(STOP_SPEED);
 
-                sleep(550); // velocity recovery
+                sleep(550);
             }
 
-            // ──────────────────────────────────────────────
-            // Step 5: Simple park back (timed + heading hold)
-            // ──────────────────────────────────────────────
-            driveStraightTimed(-1.4, DRIVE_POWER * 0.75);
+            // ──────────────────────
+            // Step 5: Simple park back
+            // ──────────────────────
+            double parkTime = 1.4;
+            if (!isRedAlliance) parkTime *= -1; // mirror timing for blue
+            driveStraightTimed(-parkTime, DRIVE_POWER * 0.75);
 
             // Cleanup
             leftLauncher.setVelocity(0);
@@ -175,10 +196,9 @@ public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
         }
     }
 
-    // ──────────────────────────────────────────────
-    // Helpers
-    // ──────────────────────────────────────────────
-
+    // ──────────────────────
+    // Helper methods
+    // ──────────────────────
     private void driveStraightTicks(int targetTicks, double basePower) {
         if (targetTicks == 0) return;
 
@@ -221,7 +241,7 @@ public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
         double startHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
         double start = runtime.seconds();
 
-        while (opModeIsActive() && runtime.seconds() - start < seconds) {
+        while (opModeIsActive() && Math.abs(runtime.seconds() - start) < Math.abs(seconds)) {
             double curr = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
             double error = startHeading - curr;
             double corr = error * HEADING_P;
