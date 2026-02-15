@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-@Autonomous(name = "Autonomous: Decode (w/ Encoders)", group = "DECODE")
+@Autonomous(name = "Autonomous: Decode (w/ Encoders)", group = "Competition 2-15-26")
 public class EncoderAutoDecode extends LinearOpMode {
 
     // Hardware from your teleop
