@@ -23,14 +23,13 @@ public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
     private IMU imu;
     private HuskyLens husky;
 
-    // Launcher & feeder constants
+    // Constants
     private final double LAUNCHER_TARGET = 1200;
     private final double LAUNCHER_MIN    = 1175;
     private final double FEED_TIME       = 0.80;
     private final double FULL_SPEED      = 1.0;
     private final double STOP_SPEED      = 0.0;
 
-    // Drive tuning
     private final double TICKS_PER_INCH  = 42.8;
     private final double DRIVE_POWER     = 0.35;
     private final double HEADING_P       = 0.018;
@@ -38,14 +37,15 @@ public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
 
-    // Alliance flag
-    private boolean isRedAlliance = true; // default
+    // Alliance enum
+    private enum Alliance {
+        RED, BLUE
+    }
+    private Alliance alliance = Alliance.RED; // default
 
     @Override
     public void runOpMode() {
-        // ──────────────────────
         // Hardware mapping
-        // ──────────────────────
         leftFrontDrive  = hardwareMap.get(DcMotorEx.class, "frontLeftMotor");
         rightFrontDrive = hardwareMap.get(DcMotorEx.class, "frontRightMotor");
         leftBackDrive   = hardwareMap.get(DcMotorEx.class, "backLeftMotor");
@@ -90,23 +90,14 @@ public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
         rightFeeder.setPower(STOP_SPEED);
         diverter.setPosition(0.15);
 
-        // ──────────────────────
-        // Alliance selection via gamepad
-        // ──────────────────────
-        telemetry.addLine("Select Alliance: A = RED, B = BLUE");
+        // ─────────────── Alliance Selection ───────────────
+        telemetry.addData("Alliance", "Press △ for BLUE, X for RED (default RED)");
         telemetry.update();
-
         while (!isStarted() && !isStopRequested()) {
-            if (gamepad1.a) {
-                isRedAlliance = true;
-                telemetry.addLine("Alliance: RED");
-                telemetry.update();
-            } else if (gamepad1.b) {
-                isRedAlliance = false;
-                telemetry.addLine("Alliance: BLUE");
-                telemetry.update();
-            }
-            sleep(50);
+            if (gamepad2.triangle) alliance = Alliance.BLUE;
+            else if (gamepad2.cross) alliance = Alliance.RED;
+            telemetry.addData("Selected", alliance);
+            telemetry.update();
         }
 
         waitForStart();
@@ -117,9 +108,7 @@ public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
             leftFrontDrive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
             imu.resetYaw();
 
-            // ──────────────────────
-            // Step 1: Detect motif
-            // ──────────────────────
+            // ───────────── Detect motif tag ─────────────
             int motifTag = -1;
             for (int i = 0; i < 30 && opModeIsActive(); i++) {
                 HuskyLens.Block[] blocks = husky.blocks();
@@ -137,20 +126,19 @@ public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
             if (motifTag == 21)      motif = "GPP";
             else if (motifTag == 22) motif = "PGP";
             else if (motifTag == 23) motif = "PPG";
-            else                     motif = "UNKNOWN";
+            else                     motif = "UNKNOWN - default center";
 
             telemetry.addData("Motif Tag", motifTag + " → " + motif);
             telemetry.update();
 
-            // ──────────────────────
-            // Step 2: Drive forward to shooting range
-            // ──────────────────────
-            int forwardTicks = isRedAlliance ? 1600 : -1600; // mirror for blue
+            // ───────────── Drive to shooting range ─────────────
+            int forwardTicks = 1600; // default
+            if (alliance == Alliance.BLUE) forwardTicks = 1600; // same distance for blue, can adjust if needed
+            else forwardTicks = 1600; // red
+
             driveStraightTicks(forwardTicks, DRIVE_POWER);
 
-            // ──────────────────────
-            // Step 3: Spin up launcher
-            // ──────────────────────
+            // ───────────── Spin up launcher ─────────────
             leftLauncher.setVelocity(LAUNCHER_TARGET);
             while (opModeIsActive() && leftLauncher.getVelocity() < LAUNCHER_MIN && runtime.seconds() < AUTO_TIMEOUT_S) {
                 telemetry.addData("Launcher", "%.0f", leftLauncher.getVelocity());
@@ -158,34 +146,26 @@ public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
                 sleep(40);
             }
 
-            // ──────────────────────
-            // Step 4: Set diverter & shoot
-            // ──────────────────────
-            double diverterPos = 0.15;
-            if (motif.startsWith("G")) {
-                diverterPos = isRedAlliance ? 0.0 : 0.2962;
-            } else if (motif.startsWith("P")) {
-                diverterPos = isRedAlliance ? 0.2962 : 0.0;
-            }
+            // ───────────── Set diverter & shoot 3× ─────────────
+            double diverterPos = 0.15; // default
+            if (motif.startsWith("G")) diverterPos = alliance == Alliance.RED ? 0.0 : 1.0;
+            else if (motif.startsWith("P")) diverterPos = alliance == Alliance.RED ? 0.2962 : 0.7; // example
+
             diverter.setPosition(diverterPos);
 
             for (int shot = 1; shot <= 3 && opModeIsActive(); shot++) {
                 leftFeeder.setPower(FULL_SPEED);
                 rightFeeder.setPower(FULL_SPEED);
                 sleep((long)(FEED_TIME * 1000));
-
                 leftFeeder.setPower(STOP_SPEED);
                 rightFeeder.setPower(STOP_SPEED);
-
                 sleep(550);
             }
 
-            // ──────────────────────
-            // Step 5: Simple park back
-            // ──────────────────────
-            double parkTime = 1.4;
-            if (!isRedAlliance) parkTime *= -1; // mirror timing for blue
-            driveStraightTimed(-parkTime, DRIVE_POWER * 0.75);
+            // ───────────── Simple park back ─────────────
+            double parkPower = DRIVE_POWER * 0.75;
+            if (alliance == Alliance.BLUE) parkPower = -parkPower; // reverse for blue if mirrored
+            driveStraightTimed(-1.4, parkPower);
 
             // Cleanup
             leftLauncher.setVelocity(0);
@@ -196,9 +176,7 @@ public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
         }
     }
 
-    // ──────────────────────
-    // Helper methods
-    // ──────────────────────
+    // ───────────── Helpers ─────────────
     private void driveStraightTicks(int targetTicks, double basePower) {
         if (targetTicks == 0) return;
 
@@ -241,7 +219,7 @@ public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
         double startHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
         double start = runtime.seconds();
 
-        while (opModeIsActive() && Math.abs(runtime.seconds() - start) < Math.abs(seconds)) {
+        while (opModeIsActive() && runtime.seconds() - start < seconds) {
             double curr = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
             double error = startHeading - curr;
             double corr = error * HEADING_P;
