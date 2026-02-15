@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
-@Autonomous(name = "Autonomous: Decode (w/ Encoders) Experimental Both Teams", group = "Competition 2-15-26")
+@Autonomous(name = "Autonomous: Decode (w/ Encoders) Experimental Both Teams V2", group = "Competition 2-15-26")
 public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
 
     // Hardware
