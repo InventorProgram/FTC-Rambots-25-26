@@ -47,9 +47,9 @@ ToDo:
  * 2025-2026 FIRST® Tech Challenge season DECODE™!
  */
 
-@TeleOp(name = "DECODE Ri3D Teleop 2", group = "Competition 2-15-26")
+@TeleOp(name = "DECODE Ri3D Teleop Experimental", group = "Competition 2-15-26")
 //@Disabled
-public class DecodeRi3D_Teleop_2 extends OpMode {
+public class DecodeRi3DTeleopExperimental extends OpMode {
     final double FEED_TIME_SECONDS = 0.80; //The feeder servos run this long when a shot is requested.
     final double STOP_SPEED = 0.0; //This is the stopping power level. We send this power to the servos when we want them to stop.
     final double FULL_SPEED = 1.0; //This is the max speed power leve.
@@ -66,13 +66,15 @@ public class DecodeRi3D_Teleop_2 extends OpMode {
     final double LEFT_POSITION = .4; //0.2962; //The left and right position for the diverter servo. These should be tuned.
     final double RIGHT_POSITION = 0;
 
+    boolean rightFeederActive = false;
+
     // Declare OpMode members.
     private DcMotor leftFrontDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor leftBackDrive = null;
     private DcMotor rightBackDrive = null;
     private DcMotorEx leftLauncher = null;
-    private DcMotorEx rightLauncher = null;
+    //private DcMotorEx rightLauncher = null;
     private DcMotor intake = null;
     private CRServo leftFeeder = null;
     private CRServo rightFeeder = null;
@@ -89,7 +91,7 @@ public class DecodeRi3D_Teleop_2 extends OpMode {
         LAUNCHING,
     }
     private LaunchState leftLaunchState;
-    private LaunchState rightLaunchState;
+    //private LaunchState rightLaunchState;
 
     private enum DiverterDirection {
         LEFT,
@@ -123,18 +125,20 @@ public class DecodeRi3D_Teleop_2 extends OpMode {
     @Override
     public void init() {
         leftLaunchState = LaunchState.IDLE;
-        rightLaunchState = LaunchState.IDLE;
+        //rightLaunchState = LaunchState.IDLE;
 
         leftFrontDrive = hardwareMap.get(DcMotor.class, "frontLeftMotor");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "frontRightMotor");
         leftBackDrive = hardwareMap.get(DcMotor.class, "backLeftMotor");
         rightBackDrive = hardwareMap.get(DcMotor.class, "backRightMotor");
         leftLauncher = hardwareMap.get(DcMotorEx.class, "leftLauncher");
-        rightLauncher = hardwareMap.get(DcMotorEx.class, "rightLauncher");
+        //rightLauncher = hardwareMap.get(DcMotorEx.class, "rightLauncher");
         intake = hardwareMap.get(DcMotor.class, "intake");
         leftFeeder = hardwareMap.get(CRServo.class, "leftFeeder");
         rightFeeder = hardwareMap.get(CRServo.class, "rightFeeder");
         diverter = hardwareMap.get(Servo.class, "diverter");
+
+        diverter.setPosition(LEFT_POSITION);
 
         /*
          * To drive forward, most robots need the motor on one side to be reversed,
@@ -153,7 +157,7 @@ public class DecodeRi3D_Teleop_2 extends OpMode {
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftLauncher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightLauncher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //rightLauncher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         /*
          * Setting zeroPowerBehavior to BRAKE enables a "brake mode". This causes the motor to
@@ -165,7 +169,7 @@ public class DecodeRi3D_Teleop_2 extends OpMode {
         leftBackDrive.setZeroPowerBehavior(BRAKE);
         rightBackDrive.setZeroPowerBehavior(BRAKE);
         leftLauncher.setZeroPowerBehavior(BRAKE);
-        rightLauncher.setZeroPowerBehavior(BRAKE);
+        //rightLauncher.setZeroPowerBehavior(BRAKE);
 
         /*
          * set Feeders to an initial value to initialize the servo controller
@@ -174,7 +178,7 @@ public class DecodeRi3D_Teleop_2 extends OpMode {
         rightFeeder.setPower(STOP_SPEED);
 
         leftLauncher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(300, 0, 0, 10));
-        rightLauncher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(300, 0, 0, 10));
+        //rightLauncher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, new PIDFCoefficients(300, 0, 0, 10));
 
         /*
          * Much like our drivetrain motors, we set the left feeder servo to reverse so that they
@@ -220,12 +224,14 @@ public class DecodeRi3D_Teleop_2 extends OpMode {
 
         if (gamepad2.triangle) {
             leftLauncher.setVelocity(launcherTarget);
-            rightLauncher.setVelocity(launcherTarget);
-        } else if (gamepad2.circle) { // stop flywheel
+            //rightLauncher.setVelocity(launcherTarget);
+        } else if (gamepad2.circle) {
             leftLauncher.setVelocity(STOP_SPEED);
-            rightLauncher.setVelocity(STOP_SPEED);
             leftLaunchState = LaunchState.IDLE;
-            rightLaunchState = LaunchState.IDLE;
+
+            // ADD THIS:
+            rightFeeder.setPower(STOP_SPEED);
+            rightFeederActive = false;
         }
 
         if (gamepad2.dpadDownWasPressed()) {
@@ -281,7 +287,7 @@ public class DecodeRi3D_Teleop_2 extends OpMode {
         telemetry.addData("State", leftLaunchState);
         telemetry.addData("launch distance", launcherDistance);
         telemetry.addData("Left Launcher Velocity", leftLauncher.getVelocity());
-        telemetry.addData("Right Launcher Velocity", rightLauncher.getVelocity());
+        //telemetry.addData("Right Launcher Velocity", rightLauncher.getVelocity());
 
     }
 
@@ -319,52 +325,49 @@ public class DecodeRi3D_Teleop_2 extends OpMode {
                     leftLaunchState = LaunchState.SPIN_UP;
                 }
                 break;
+
             case SPIN_UP:
                 leftLauncher.setVelocity(launcherTarget);
-                rightLauncher.setVelocity(launcherTarget);
+
                 if (leftLauncher.getVelocity() > launcherMin) {
                     leftLaunchState = LaunchState.LAUNCH;
                 }
                 break;
+
             case LAUNCH:
                 leftFeeder.setPower(FULL_SPEED);
                 leftFeederTimer.reset();
                 leftLaunchState = LaunchState.LAUNCHING;
                 break;
+
             case LAUNCHING:
                 if (leftFeederTimer.seconds() > FEED_TIME_SECONDS) {
-                    leftLaunchState = LaunchState.IDLE;
                     leftFeeder.setPower(STOP_SPEED);
+                    leftLaunchState = LaunchState.IDLE;
                 }
                 break;
         }
     }
 
     void launchRight(boolean shotRequested) {
-        switch (rightLaunchState) {
-            case IDLE:
-                if (shotRequested) {
-                    rightLaunchState = LaunchState.SPIN_UP;
-                }
-                break;
-            case SPIN_UP:
-                leftLauncher.setVelocity(launcherTarget);
-                rightLauncher.setVelocity(launcherTarget);
-                if (leftLauncher.getVelocity() > launcherMin) {
-                    rightLaunchState = LaunchState.LAUNCH;
-                }
-                break;
-            case LAUNCH:
+
+        if (shotRequested && !rightFeederActive) {
+
+            // ensure flywheel spinning
+            leftLauncher.setVelocity(launcherTarget);
+
+            if (leftLauncher.getVelocity() > launcherMin) {
+
                 rightFeeder.setPower(FULL_SPEED);
                 rightFeederTimer.reset();
-                rightLaunchState = LaunchState.LAUNCHING;
-                break;
-            case LAUNCHING:
-                if (rightFeederTimer.seconds() > FEED_TIME_SECONDS) {
-                    rightLaunchState = LaunchState.IDLE;
-                    rightFeeder.setPower(STOP_SPEED);
-                }
-                break;
+                rightFeederActive = true;
+            }
+        }
+
+        if (rightFeederActive && rightFeederTimer.seconds() > FEED_TIME_SECONDS) {
+
+            rightFeeder.setPower(STOP_SPEED);
+            rightFeederActive = false;
         }
     }
 }
