@@ -5,7 +5,6 @@ import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -18,7 +17,7 @@ public class EncoderAutoDecodeExperimental extends LinearOpMode {
 
     // Hardware from your teleop
     private DcMotorEx leftFrontDrive, rightFrontDrive, leftBackDrive, rightBackDrive;
-    private DcMotorEx leftLauncher, rightLauncher;
+    private DcMotorEx leftLauncher;
     private CRServo leftFeeder, rightFeeder;
     private Servo diverter;
     private IMU imu;
@@ -47,26 +46,24 @@ public class EncoderAutoDecodeExperimental extends LinearOpMode {
         leftBackDrive   = hardwareMap.get(DcMotorEx.class, "backLeftMotor");
         rightBackDrive  = hardwareMap.get(DcMotorEx.class, "backRightMotor");
         leftLauncher    = hardwareMap.get(DcMotorEx.class, "leftLauncher");
-        rightLauncher   = hardwareMap.get(DcMotorEx.class, "rightLauncher");
         leftFeeder      = hardwareMap.get(CRServo.class, "leftFeeder");
         rightFeeder     = hardwareMap.get(CRServo.class, "rightFeeder");
         diverter        = hardwareMap.get(Servo.class, "diverter");
 
         // Directions & modes (from your teleop)
-        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-        rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
-        leftLauncher.setDirection(DcMotor.Direction.REVERSE);
-        rightFeeder.setDirection(DcMotor.Direction.REVERSE);
+        leftFrontDrive.setDirection(DcMotorEx.Direction.REVERSE);
+        rightFrontDrive.setDirection(DcMotorEx.Direction.FORWARD);
+        leftBackDrive.setDirection(DcMotorEx.Direction.REVERSE);
+        rightBackDrive.setDirection(DcMotorEx.Direction.FORWARD);
+        leftLauncher.setDirection(DcMotorEx.Direction.REVERSE);
+        rightFeeder.setDirection(DcMotorEx.Direction.REVERSE);
 
-        leftLauncher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightLauncher.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftLauncher.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
 
-        leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftFrontDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        rightFrontDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        leftBackDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        rightBackDrive.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
 
         // IMU setup
         imu = hardwareMap.get(IMU.class, "imu");
@@ -97,8 +94,8 @@ public class EncoderAutoDecodeExperimental extends LinearOpMode {
 
         if (opModeIsActive()) {
             // Reset drive encoder (only one has it)
-            leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            leftFrontDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            leftFrontDrive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+            leftFrontDrive.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
             imu.resetYaw();
 
             // ──────────────────────────────────────────────
@@ -109,7 +106,7 @@ public class EncoderAutoDecodeExperimental extends LinearOpMode {
                 HuskyLens.Block[] blocks = husky.blocks();
                 for (HuskyLens.Block b : blocks) {
                     if (b.id >= 21 && b.id <= 23) {
-                        motifTag = (int) b.id;
+                        motifTag = b.id;
                         break;
                     }
                 }
@@ -135,13 +132,9 @@ public class EncoderAutoDecodeExperimental extends LinearOpMode {
             // Step 3: Spin up launcher
             // ──────────────────────────────────────────────
             leftLauncher.setVelocity(LAUNCHER_TARGET);
-            rightLauncher.setVelocity(LAUNCHER_TARGET);
 
-            while (opModeIsActive() &&
-                    (leftLauncher.getVelocity() < LAUNCHER_MIN ||
-                            leftLauncher.getVelocity() < LAUNCHER_MIN) &&
-                    runtime.seconds() < AUTO_TIMEOUT_S) {
-                telemetry.addData("Launcher L/R", "%.0f / %.0f", leftLauncher.getVelocity(), leftLauncher.getVelocity());
+            while (opModeIsActive() && leftLauncher.getVelocity() < LAUNCHER_MIN && runtime.seconds() < AUTO_TIMEOUT_S) {
+                telemetry.addData("Launcher", "%.0f", leftLauncher.getVelocity());
                 telemetry.update();
                 sleep(40);
             }
@@ -175,7 +168,6 @@ public class EncoderAutoDecodeExperimental extends LinearOpMode {
 
             // Cleanup
             leftLauncher.setVelocity(0);
-            rightLauncher.setVelocity(0);
             stopDrive();
 
             telemetry.addData("Auto", "Complete - %.1f s", runtime.seconds());
@@ -190,9 +182,9 @@ public class EncoderAutoDecodeExperimental extends LinearOpMode {
     private void driveStraightTicks(int targetTicks, double basePower) {
         if (targetTicks == 0) return;
 
-        leftFrontDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftFrontDrive.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         leftFrontDrive.setTargetPosition(targetTicks);
-        leftFrontDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftFrontDrive.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
 
         double startHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
         double startTime = runtime.seconds();
@@ -207,7 +199,6 @@ public class EncoderAutoDecodeExperimental extends LinearOpMode {
             double lb = basePower - correction;
             double rb = basePower + correction;
 
-            // simple clamp
             lf = Math.max(-1.0, Math.min(1.0, lf));
             rf = Math.max(-1.0, Math.min(1.0, rf));
             lb = Math.max(-1.0, Math.min(1.0, lb));
