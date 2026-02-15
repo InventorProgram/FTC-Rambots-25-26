@@ -132,7 +132,7 @@ public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
             telemetry.update();
 
             // ───────────── Drive to midfield, pointed at goal ─────────────
-            int forwardTicks = 900; // stops roughly at midfield (adjust after testing)
+            int forwardTicks = 800; // stops roughly at midfield (adjust after testing)
             driveStraightTicks(forwardTicks, DRIVE_POWER);
 
             // ───────────── Spin up launcher ─────────────
