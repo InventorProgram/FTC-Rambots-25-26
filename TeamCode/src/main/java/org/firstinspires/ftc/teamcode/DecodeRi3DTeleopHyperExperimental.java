@@ -31,7 +31,7 @@ public class DecodeRi3DTeleopHyperExperimental extends OpMode {
     private double launcherTarget = LAUNCHER_CLOSE_TARGET_VELOCITY;
     private double launcherMin = LAUNCHER_CLOSE_MIN_VELOCITY;
 
-    private static final double LEFT_POSITION = 0.4;
+    private static final double LEFT_POSITION = 0.8;
     private static final double RIGHT_POSITION = 0;
 
     private boolean rightFeederActive = false;

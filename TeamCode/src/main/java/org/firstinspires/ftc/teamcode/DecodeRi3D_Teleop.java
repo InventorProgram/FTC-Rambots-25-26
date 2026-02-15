@@ -63,7 +63,7 @@ public class DecodeRi3D_Teleop extends OpMode {
     double launcherTarget = LAUNCHER_CLOSE_TARGET_VELOCITY; //These variables allow
     double launcherMin = LAUNCHER_CLOSE_MIN_VELOCITY;
 
-    final double LEFT_POSITION = .4; //0.2962; //The left and right position for the diverter servo. These should be tuned.
+    final double LEFT_POSITION = .8; //0.2962; //The left and right position for the diverter servo. These should be tuned.
     final double RIGHT_POSITION = 0;
 
     // Declare OpMode members.
