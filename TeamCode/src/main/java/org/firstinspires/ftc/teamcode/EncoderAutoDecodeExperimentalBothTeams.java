@@ -131,11 +131,8 @@ public class EncoderAutoDecodeExperimentalBothTeams extends LinearOpMode {
             telemetry.addData("Motif Tag", motifTag + " → " + motif);
             telemetry.update();
 
-            // ───────────── Drive to shooting range ─────────────
-            int forwardTicks = 1600; // default
-            if (alliance == Alliance.BLUE) forwardTicks = 1600; // same distance for blue, can adjust if needed
-            else forwardTicks = 1600; // red
-
+            // ───────────── Drive to midfield, pointed at goal ─────────────
+            int forwardTicks = 900; // stops roughly at midfield (adjust after testing)
             driveStraightTicks(forwardTicks, DRIVE_POWER);
 
             // ───────────── Spin up launcher ─────────────
